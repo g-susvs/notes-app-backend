@@ -1,8 +1,8 @@
-import { NotFoundError } from "../../shared/errors";
-import { UserRepository } from "../../users/domain/user-repository";
-import { CreateNoteDto } from "../domain/note-dto";
-import { NoteRepository } from "../domain/note-repository";
-import { NoteValue } from "../domain/note-value";
+import { ForbiddenError, NotFoundError } from '../../shared/errors';
+import { UserRepository } from '../../users/domain/user-repository';
+import { CreateNoteDto } from '../domain/note-dto';
+import { NoteRepository } from '../domain/note-repository';
+import { NoteValue } from '../domain/note-value';
 
 export class NoteUseCase {
     constructor(
@@ -10,33 +10,31 @@ export class NoteUseCase {
         private readonly userRepository: UserRepository
     ) { }
 
-    public findNoteById = async (id: string) => {
+    public findNoteById = async (id: string, uid: string) => {
+        const note = await this.noteRepository.findById(id);
 
-        const note = await this.noteRepository.findById(id)
+        if (!note) throw new NotFoundError('Note Not-found');
 
-        if (!note) throw new NotFoundError("Note Not-found");
+        if (note.user_id !== uid) throw new ForbiddenError('No tiene acceso');
 
-        return note
-    }
+        return note;
+    };
 
-    public findNotes = async () => {
+    public findNotes = async (uid: string) => {
+        const notes = await this.noteRepository.findNotesByUserId(uid);
 
-        const notes = await this.noteRepository.findAllNotes()
+        return notes;
+    };
 
-        return notes
-    }
+    public createNote = async ({ title, content, user_id }: CreateNoteDto) => {
+        const noteValue = new NoteValue({ title, content, user_id });
 
-    public createNote = async ({ title, content, user_id, }: CreateNoteDto) => {
+        const user = await this.userRepository.findByUid(user_id);
 
-        const noteValue = new NoteValue({ title, content, user_id })
+        if (!user) throw new NotFoundError('User not exist');
 
-        const user = await this.userRepository.findByUid(user_id)
+        const note = await this.noteRepository.create(noteValue);
 
-        if (!user) throw new NotFoundError("User not exist");
-
-        const note = await this.noteRepository.create(noteValue)
-
-        return note
-    }
-
+        return note;
+    };
 }

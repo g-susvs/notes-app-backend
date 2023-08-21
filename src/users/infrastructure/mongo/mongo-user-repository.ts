@@ -1,33 +1,40 @@
 import bcryptjs from 'bcryptjs';
-import { UserEntity } from "../../domain/user-entity";
-import { UserRepository } from "../../domain/user-repository";
-import UserSchema from "./user-schema";
+import { type UserEntity } from '../../domain/user-entity';
+import { type UserRepository } from '../../domain/user-repository';
+import UserSchema from './user-schema';
 
 export class MongoUserRepository implements UserRepository {
+	private static instance: MongoUserRepository | null = null;
 
-    async findByUid(uid: string) {
-        const user = await UserSchema.findOne<UserEntity>({ uid })
+	private constructor() {}
 
-        return user
-    }
+	static getInstance() {
+		if (!MongoUserRepository.instance) {
+			MongoUserRepository.instance = new MongoUserRepository();
+		}
+		return MongoUserRepository.instance;
+	}
 
+	async findByUid(uid: string) {
+		const user = await UserSchema.findOne<UserEntity>({ uid });
 
-    async findByEmail(email: string) {
+		return user;
+	}
 
-        const user = await UserSchema.findOne<UserEntity>({ email })
+	async findByEmail(email: string) {
+		const user = await UserSchema.findOne<UserEntity>({ email });
 
-        return user
-    }
+		return user;
+	}
 
-    async create(newUser: UserEntity) {
-        const user = await UserSchema.create(newUser)
+	async create(newUser: UserEntity) {
+		const user = await UserSchema.create(newUser);
 
-        const salt = bcryptjs.genSaltSync(10);
-        user.password = bcryptjs.hashSync(user.password, salt);
+		const salt = bcryptjs.genSaltSync(10);
+		user.password = bcryptjs.hashSync(user.password, salt);
 
-        await user.save()
+		await user.save();
 
-        return user as unknown as UserEntity
-    }
-
+		return user as unknown as UserEntity;
+	}
 }

@@ -1,10 +1,23 @@
-import { Router } from 'express'
-import { noteCtrl } from './dependencies'
+import { Router } from 'express';
+import { noteCtrl } from './dependencies';
+import { validateFields } from '../../../middlewares/validate-fields';
+import { body } from 'express-validator';
+import { verifyJWT } from '../../../helpers/verify-jwt';
 
-const router = Router()
+const router = Router();
 
-router.get('/:id', noteCtrl.getById)
-router.get('/', noteCtrl.getAll)
-router.post('/', noteCtrl.insert)
+router.use(verifyJWT);
 
-export default router
+router.get('/:id', noteCtrl.getById);
+router.get('/', noteCtrl.getAll);
+router.post(
+	'/',
+	[
+		body('title', 'Es requerido').notEmpty(),
+		body('content', 'Es requerido').notEmpty(),
+		validateFields
+	],
+	noteCtrl.insert
+);
+
+export default router;

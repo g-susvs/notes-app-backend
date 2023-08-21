@@ -1,29 +1,28 @@
-import { v4 as uuid } from "uuid";
-import { UserEntity } from "./user-entity";
-
-
+import { v4 as uuid } from 'uuid';
+import { type UserEntity } from './user-entity';
 
 export class UserValue implements UserEntity {
-    uid: string;
-    name: string;
-    email: string;
-    password: string;
-    imagen: string;
+	uid: string;
+	name: string;
+	email: string;
+	password: string;
+	image: string;
 
-    constructor({
-        name, email, password,
-        imagen
-    }: {
-        name: string,
-        email: string,
-        password: string,
-        imagen?: string,
-    }) {
-        this.uid = uuid();
-        this.name = name;
-        this.email = email;
-        this.password = password
-        this.imagen = imagen ?? ""
-    }
-
+	constructor({
+		name,
+		email,
+		password,
+		image
+	}: {
+		name: string;
+		email: string;
+		password: string;
+		image?: string;
+	}) {
+		this.uid = uuid();
+		this.name = name;
+		this.email = email;
+		this.password = password;
+		this.image = image ?? '';
+	}
 }

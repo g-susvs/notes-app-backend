@@ -1,8 +1,7 @@
-import { NoteEntity } from "./note-entity";
-import { NoteValue } from "./note-value";
+import { type NoteEntity } from './note-entity';
 
 export interface NoteRepository {
-    findById(id: string): Promise<NoteEntity | null>,
-    findAllNotes(): Promise<NoteEntity[] | null>,
-    create(newNote: NoteEntity): Promise<NoteEntity | null>
+	findById: (id: string) => Promise<NoteEntity | null>;
+	findNotesByUserId: (uid: string) => Promise<NoteEntity[] | null>;
+	create: (newNote: NoteEntity) => Promise<NoteEntity | null>;
 }

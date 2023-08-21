@@ -1,41 +1,47 @@
-import { Request, Response } from "express";
-import { NoteUseCase } from "../../application/note-use-case";
-import { Rsp } from "../../../shared/response";
+import { type Request, type Response } from 'express';
+import { type NoteUseCase } from '../../application/note-use-case';
+import { Rsp } from '../../../shared/response';
 
 export class NoteController {
-    constructor(private noteUseCase: NoteUseCase) { }
+	constructor(private readonly noteUseCase: NoteUseCase) {}
 
-    public getById = async (req: Request, res: Response) => {
-        try {
-            const { id = '' } = req.params;
-            const note = await this.noteUseCase.findNoteById(`${id}`);
-            return Rsp.success(res, note, 200)
+	public getById = async (req: Request, res: Response) => {
+		try {
+			const { id = '' } = req.params;
+			const note = await this.noteUseCase.findNoteById(id, req.uid!);
 
+			return Rsp.success(res, note, 200);
+		} catch (error) {
+			console.log(error);
+			return Rsp.error(res, error);
+		}
+	};
 
-        } catch (error) {
-            console.log(error)
-            return Rsp.error(res, error)
-        }
-    }
-    public getAll = async (req: Request, res: Response) => {
-        try {
-            const notes = await this.noteUseCase.findNotes();
-            return Rsp.success(res, notes, 200)
+	public getAll = async (req: Request, res: Response) => {
+		try {
+			const uid = req.uid ?? '';
 
-        } catch (error) {
-            console.log(error)
-            return Rsp.error(res, error)
-        }
-    }
+			const notes = await this.noteUseCase.findNotes(uid);
 
-    public insert = async ({ body }: Request, res: Response) => {
-        try {
-            const note = await this.noteUseCase.createNote(body);
-            return Rsp.success(res, note, 200)
+			return Rsp.success(res, notes, 200);
+		} catch (error) {
+			console.log(error);
+			return Rsp.error(res, error);
+		}
+	};
 
-        } catch (error) {
-            console.log(error)
-            return Rsp.error(res, error)
-        }
-    }
+	public insert = async (req: Request, res: Response) => {
+		try {
+			const data = {
+				...req.body,
+				user_id: req.uid
+			};
+
+			const note = await this.noteUseCase.createNote(data);
+			return Rsp.success(res, note, 200);
+		} catch (error) {
+			console.log(error);
+			return Rsp.error(res, error);
+		}
+	};
 }
