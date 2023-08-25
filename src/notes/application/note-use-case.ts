@@ -1,6 +1,6 @@
 import { ForbiddenError, NotFoundError } from '../../shared/errors';
 import { UserRepository } from '../../users/domain/user-repository';
-import { CreateNoteDto } from '../domain/note-dto';
+import { CreateNoteDto, UpdateNoteDto } from '../domain/note-dto';
 import { NoteRepository } from '../domain/note-repository';
 import { NoteValue } from '../domain/note-value';
 
@@ -27,9 +27,9 @@ export class NoteUseCase {
     };
 
     public createNote = async ({ title, content, user_id }: CreateNoteDto) => {
-        const noteValue = new NoteValue({ title, content, user_id });
-
         const user = await this.userRepository.findByUid(user_id);
+
+        const noteValue = new NoteValue({ title, content, user_id });
 
         if (!user) throw new NotFoundError('User not exist');
 
@@ -37,4 +37,31 @@ export class NoteUseCase {
 
         return note;
     };
+
+    public updateNote = async (id: string, updateNote: UpdateNoteDto, uid: string) => {
+
+        const noteExist = await this.noteRepository.findById(id)
+
+        if (!noteExist) throw new NotFoundError('Note not exist');
+
+        if (noteExist.user_id !== uid) throw new ForbiddenError('No tiene acceso');
+
+        const note = await this.noteRepository.update(id, updateNote)
+
+        return note;
+    }
+    public deleteNote = async (id: string, uid: string) => {
+
+        const noteExist = await this.noteRepository.findById(id)
+
+        if (!noteExist) throw new NotFoundError('Note not exist');
+
+        if (noteExist.user_id !== uid) throw new ForbiddenError('No tiene acceso');
+
+        const note = await this.noteRepository.delete(id)
+
+        if (!note) throw new NotFoundError('Note not exist');
+
+        return note;
+    }
 }

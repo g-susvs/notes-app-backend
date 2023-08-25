@@ -14,10 +14,11 @@ router.post(
 	'/',
 	[
 		body('title', 'Es requerido').notEmpty(),
-		body('content', 'Es requerido').notEmpty(),
 		validateFields
 	],
 	noteCtrl.insert
 );
+router.put('/:id', noteCtrl.update);
+router.delete('/:id', noteCtrl.delete);
 
 export default router;

@@ -3,7 +3,7 @@ import { type NoteUseCase } from '../../application/note-use-case';
 import { Rsp } from '../../../shared/response';
 
 export class NoteController {
-	constructor(private readonly noteUseCase: NoteUseCase) {}
+	constructor(private readonly noteUseCase: NoteUseCase) { }
 
 	public getById = async (req: Request, res: Response) => {
 		try {
@@ -38,6 +38,30 @@ export class NoteController {
 			};
 
 			const note = await this.noteUseCase.createNote(data);
+			return Rsp.success(res, note, 200);
+		} catch (error) {
+			console.log(error);
+			return Rsp.error(res, error);
+		}
+	};
+	public update = async (req: Request, res: Response) => {
+		try {
+			const { id } = req.params
+
+			const note = await this.noteUseCase.updateNote(id, req.body, req.uid!);
+
+			return Rsp.success(res, note, 200);
+		} catch (error) {
+			console.log(error);
+			return Rsp.error(res, error);
+		}
+	};
+	public delete = async (req: Request, res: Response) => {
+		try {
+			const { id } = req.params
+
+			const note = await this.noteUseCase.deleteNote(id, req.uid!);
+
 			return Rsp.success(res, note, 200);
 		} catch (error) {
 			console.log(error);
