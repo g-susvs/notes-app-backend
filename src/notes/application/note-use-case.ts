@@ -29,6 +29,10 @@ export class NoteUseCase {
     public createNote = async ({ title, content, user_id }: CreateNoteDto) => {
         const user = await this.userRepository.findByUid(user_id);
 
+        if (content.trim().length === 0) {
+            content = `# ${title}`
+        }
+
         const noteValue = new NoteValue({ title, content, user_id });
 
         if (!user) throw new NotFoundError('User not exist');
