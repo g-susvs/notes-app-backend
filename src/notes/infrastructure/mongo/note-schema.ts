@@ -2,6 +2,7 @@ import { Schema, model } from 'mongoose';
 
 const noteSchema = new Schema({
 	id: { type: String, required: true, unique: true },
+	emoji: { type: String, required: true },
 	title: { type: String, required: true },
 	content: { type: String },
 	user_id: {

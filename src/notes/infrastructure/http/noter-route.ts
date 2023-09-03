@@ -13,6 +13,8 @@ router.get('/', noteCtrl.getAll);
 router.post(
 	'/',
 	[
+		body('emoji', 'Es requerido').notEmpty(),
+		body('emoji', 'Debe tener solo un elemento').isLength({ min: 1, max: 1 }),
 		body('title', 'Es requerido').notEmpty(),
 		validateFields
 	],

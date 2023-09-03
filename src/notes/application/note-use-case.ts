@@ -26,14 +26,14 @@ export class NoteUseCase {
         return notes;
     };
 
-    public createNote = async ({ title, content, user_id }: CreateNoteDto) => {
+    public createNote = async ({ title, content, user_id, emoji }: CreateNoteDto) => {
         const user = await this.userRepository.findByUid(user_id);
 
         if (content.trim().length === 0) {
             content = `# ${title}`
         }
 
-        const noteValue = new NoteValue({ title, content, user_id });
+        const noteValue = new NoteValue({ title, content, user_id, emoji });
 
         if (!user) throw new NotFoundError('User not exist');
 
@@ -50,10 +50,16 @@ export class NoteUseCase {
 
         if (noteExist.user_id !== uid) throw new ForbiddenError('No tiene acceso');
 
+        if (updateNote.emoji && updateNote.emoji?.length > 1) {
+            let emoji = updateNote.emoji.trim()
+            updateNote.emoji = Array.from(emoji)[0]
+        }
+
         const note = await this.noteRepository.update(id, updateNote)
 
         return note;
     }
+
     public deleteNote = async (id: string, uid: string) => {
 
         const noteExist = await this.noteRepository.findById(id)
